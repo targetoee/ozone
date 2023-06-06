@@ -360,6 +360,15 @@ public class OMKeyCreateRequest extends OMKeyRequest {
     return omClientResponse;
   }
 
+  @Override
+  protected String getDBMultipartOpenKey(
+      String volumeName, String bucketName, String keyName,
+      String uploadID, OMMetadataManager omMetadataManager)
+      throws IOException {
+    return getMultipartOpenKeyFSO(volumeName, bucketName, keyName,
+        uploadID, omMetadataManager);
+  }
+
   protected void logResult(CreateKeyRequest createKeyRequest,
       OMMetrics omMetrics, IOException exception, Result result,
        int numMissingParents) {

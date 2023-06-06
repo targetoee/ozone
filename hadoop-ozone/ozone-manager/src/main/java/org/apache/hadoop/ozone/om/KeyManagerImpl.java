@@ -766,7 +766,7 @@ public class KeyManagerImpl implements KeyManager {
           //if there are no parts, use the replicationType from the open key.
           if (isBucketFSOptimized(volumeName, bucketName)) {
             multipartKey =
-                OMKeyRequest.getMultipartOpenKeyFSO(volumeName, bucketName,
+                getMultipartOpenKeyFSO(volumeName, bucketName,
                     keyName, uploadID, metadataManager);
           }
           OmKeyInfo omKeyInfo =
@@ -837,6 +837,12 @@ public class KeyManagerImpl implements KeyManager {
     return partName;
   }
 
+  private String getMultipartOpenKeyFSO(String volumeName, String bucketName,
+      String keyName, String uploadID, OMMetadataManager omMetadataManager) throws IOException {
+    return OMKeyRequest.getMultipartOpenKeyFSO(
+        volumeName, bucketName, keyName,
+        uploadID, omMetadataManager);
+  }
   /**
    * Returns list of ACLs for given Ozone object.
    *
