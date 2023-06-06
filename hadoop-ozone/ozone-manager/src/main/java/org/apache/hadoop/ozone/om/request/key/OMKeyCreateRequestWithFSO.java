@@ -28,7 +28,6 @@ import org.apache.hadoop.ozone.om.exceptions.OMException;
 import org.apache.hadoop.ozone.om.helpers.OmBucketInfo;
 import org.apache.hadoop.ozone.om.helpers.OmDirectoryInfo;
 import org.apache.hadoop.ozone.om.helpers.OmKeyInfo;
-import org.apache.hadoop.ozone.om.helpers.OzoneFSUtils;
 import org.apache.hadoop.ozone.om.helpers.BucketLayout;
 import org.apache.hadoop.ozone.om.helpers.OmKeyLocationInfo;
 import org.apache.hadoop.ozone.om.ratis.utils.OzoneManagerDoubleBufferHelper;
@@ -55,7 +54,6 @@ import static org.apache.hadoop.ozone.om.exceptions.OMException.ResultCodes.NOT_
 import static org.apache.hadoop.ozone.om.lock.OzoneManagerLock.Resource.BUCKET_LOCK;
 import static org.apache.hadoop.ozone.om.request.file.OMFileRequest.OMDirectoryResult.DIRECTORY_EXISTS;
 import static org.apache.hadoop.ozone.om.request.file.OMFileRequest.OMDirectoryResult.FILE_EXISTS_IN_GIVENPATH;
-import static org.apache.hadoop.ozone.om.request.file.OMFileRequest.getParentId;
 
 /**
  * Handles CreateKey request layout version1.
@@ -241,34 +239,5 @@ public class OMKeyCreateRequestWithFSO extends OMKeyCreateRequest {
             numKeysCreated);
 
     return omClientResponse;
-  }
-
-  /**
-   * Returns the DB key name of a multipart open key in OM metadata store.
-   *
-   * @param volumeName        - volume name.
-   * @param bucketName        - bucket name.
-   * @param keyName           - key name.
-   * @param uploadID          - Multi part upload ID for this key.
-   * @param omMetadataManager
-   * @return
-   * @throws IOException
-   */
-  @Override
-  protected String getDBMultipartOpenKey(String volumeName, String bucketName,
-                                         String keyName, String uploadID,
-                                         OMMetadataManager omMetadataManager)
-      throws IOException {
-
-    final long volumeId = omMetadataManager.getVolumeId(volumeName);
-    final long bucketId = omMetadataManager.getBucketId(volumeName,
-            bucketName);
-    long parentId =
-        getParentId(omMetadataManager, volumeName, bucketName, keyName);
-
-    String fileName = OzoneFSUtils.getFileName(keyName);
-
-    return omMetadataManager.getMultipartKey(volumeId, bucketId, parentId,
-            fileName, uploadID);
   }
 }

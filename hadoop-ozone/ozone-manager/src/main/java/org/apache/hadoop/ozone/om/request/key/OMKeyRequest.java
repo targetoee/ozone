@@ -52,6 +52,7 @@ import org.apache.hadoop.ozone.om.helpers.OmKeyLocationInfoGroup;
 import org.apache.hadoop.ozone.om.helpers.OmPrefixInfo;
 import org.apache.hadoop.ozone.om.helpers.OmVolumeArgs;
 import org.apache.hadoop.ozone.om.helpers.OzoneAclUtil;
+import org.apache.hadoop.ozone.om.helpers.OzoneFSUtils;
 import org.apache.hadoop.ozone.om.helpers.QuotaUtil;
 import org.apache.hadoop.ozone.om.helpers.RepeatedOmKeyInfo;
 import org.apache.hadoop.ozone.om.lock.OzoneLockStrategy;
@@ -791,6 +792,31 @@ public abstract class OMKeyRequest extends OMClientRequest {
 
     return omMetadataManager
         .getMultipartKey(volumeName, bucketName, keyName, uploadID);
+  }
+
+  /**
+   * Returns the FSO key name of a multipart open key in OM metadata store.
+   * @param volumeName
+   * @param bucketName
+   * @param keyName
+   * @param uploadID
+   * @param omMetadataManager
+   * @return multi-part upload key
+   * @throws IOException
+   */
+  public static String getMultipartOpenKeyFSO(
+      String volumeName, String bucketName, String keyName,
+      String uploadID, OMMetadataManager omMetadataManager)
+      throws IOException {
+    final long volumeId = omMetadataManager.getVolumeId(volumeName);
+    final long bucketId = omMetadataManager.getBucketId(volumeName,
+        bucketName);
+    long parentId = OMFileRequest.getParentId(omMetadataManager,
+        volumeName, bucketName, keyName);
+    String fileName = OzoneFSUtils.getFileName(keyName);
+
+    return omMetadataManager.getMultipartKey(volumeId, bucketId,
+        parentId, fileName, uploadID);
   }
 
   /**
