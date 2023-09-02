@@ -104,7 +104,7 @@ public class GrpcContainerUploader implements ContainerUploader {
     private final DatanodeDetails target;
     private final CompletableFuture<Void> callback;
     private AtomicBoolean error = new AtomicBoolean(false);
-    private volatile Throwable throwable = null;
+    private Throwable throwable = null;
 
     SendContainerResponseStreamObserver(long containerId,
         DatanodeDetails target, CompletableFuture<Void> callback) {

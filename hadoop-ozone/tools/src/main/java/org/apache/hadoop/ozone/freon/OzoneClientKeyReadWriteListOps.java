@@ -212,7 +212,13 @@ public class OzoneClientKeyReadWriteListOps extends BaseFreonGenerator
     if (!readMetadataOnly) {
       byte[] data = new byte[objectSizeInBytes];
       try (OzoneInputStream introStream = keyDetails.getContent()) {
-        introStream.read(data);
+        int count = 0;
+        while (true) {
+          count = introStream.read(data);
+          if (count == -1) {
+            break;
+          }
+        }
       } catch (Exception ex) {
         throw ex;
       }

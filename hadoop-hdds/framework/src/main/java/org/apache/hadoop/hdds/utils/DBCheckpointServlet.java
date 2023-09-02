@@ -76,7 +76,8 @@ public class DBCheckpointServlet extends HttpServlet
   private boolean isSpnegoEnabled;
   private transient OzoneAdmins admins;
   private transient BootstrapStateHandler.Lock lock;
-  private transient File bootstrapTempData;
+  private final transient ThreadLocal<Path> bootstrapTempPath =
+      new ThreadLocal<Path>();
 
   public void initialize(DBStore store, DBCheckpointMetrics metrics,
                          boolean omAclEnabled,
@@ -107,12 +108,13 @@ public class DBCheckpointServlet extends HttpServlet
     if (tempData == null) {
       throw new NullPointerException("tempData dir is null");
     }
-    bootstrapTempData = Paths.get(tempData,
+    File bootstrapTmpFile = Paths.get(tempData,
         "temp-bootstrap-data").toFile();
-    if (!bootstrapTempData.exists() &&
-        !bootstrapTempData.mkdirs()) {
-      throw new ServletException("Failed to make:" + bootstrapTempData);
+    if (!bootstrapTmpFile.exists() &&
+        !bootstrapTmpFile.mkdirs()) {
+      throw new ServletException("Failed to make:" + bootstrapTmpFile);
     }
+    bootstrapTempPath.set(bootstrapTmpFile.toPath());
   }
 
   private boolean hasPermission(UserGroupInformation user) {
@@ -195,7 +197,7 @@ public class DBCheckpointServlet extends HttpServlet
 
     Path tmpdir = null;
     try (BootstrapStateHandler.Lock lock = getBootstrapStateLock().lock()) {
-      tmpdir = Files.createTempDirectory(bootstrapTempData.toPath(),
+      tmpdir = Files.createTempDirectory(bootstrapTempPath.get(),
           "bootstrap-data-");
       checkpoint = getCheckpoint(tmpdir, flush);
       if (checkpoint == null || checkpoint.getCheckpointLocation() == null) {

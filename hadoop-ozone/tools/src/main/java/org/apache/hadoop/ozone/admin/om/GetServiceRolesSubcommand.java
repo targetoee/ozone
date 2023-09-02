@@ -99,11 +99,10 @@ public class GetServiceRolesSubcommand implements Callable<Void> {
       if (omRoleInfo != null &&
           serviceInfo.getNodeType() == HddsProtos.NodeType.OM) {
         Map<String, Map<String, String>> omService = new HashMap<>();
-        omService.put(omRoleInfo.getNodeId(),
-            new HashMap<String, String>() {{
-              put("serverRole", omRoleInfo.getServerRole());
-              put("hostname", serviceInfo.getHostname());
-            }});
+        Map source = new HashMap<String, String>();
+        source.put("serverRole", omRoleInfo.getServerRole());
+        source.put("hostname", serviceInfo.getHostname());
+        omService.put(omRoleInfo.getNodeId(), source);
         omServiceList.add(omService);
       }
     }
